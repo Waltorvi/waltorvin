@@ -1,0 +1,142 @@
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import { fade } from 'svelte/transition';
+
+    import { focusTerminal } from "$lib/stores";
+
+    type HistoryLine = {
+        id: number;
+        text: string;
+        isCommand?: boolean; // Чтобы команды можно было стилизовать иначе
+    };
+
+    let inputRef: HTMLInputElement;
+    let command = ''; // Текущая введенная команда
+    let history: HistoryLine[] = [];
+    let historyIndex = 0;
+
+    // Функция помощник, чтобы создать эффект печати
+    const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+    async function handleCommand() {
+        if (!command.trim()) return;
+        command = command.replace('/', '')
+
+        addHistoryLine(command, true);
+
+        const userCommand = command;
+        command = ''; // Очищаем инпут мгновенно, чтобы пользователь мог печатать дальше
+
+        if (userCommand.toLowerCase() === 'help') {
+            await typeResponse('Доступные команды: [about], [socials], [clear]. Но они появятся чуть позже, дорогуша!');
+        }
+        else if (userCommand.toLowerCase() === 'rarity') {
+            await typeResponse('тут будет че та да')
+        } else if (userCommand.toLowerCase() === 'socials') {
+            await typeResponse('Telegram: @Waltorvi<br> <i style="color: blue">Twitter</i>: <i style="color: red">@Waltorvi</i>', true)
+        } else {
+            await typeResponse(`Неизвестная команда: "${userCommand}". Попробуй 'help'.`);
+        }
+    }
+
+    function addHistoryLine(text: string, isCommand = false) {
+        history = [...history, { id: historyIndex++, text, isCommand }];
+    }
+
+    async function typeResponse(text: string, isHtml = false) {
+        addHistoryLine('');
+
+        const lastLine = history[history.length - 1];
+        if (isHtml) {
+            await sleep(100);
+            lastLine.text = text;
+        } else {
+            for (let i = 0; i < text.length; i++) {
+                lastLine.text += text.charAt(i);
+                history = history;
+                await sleep(15 - i/10);
+            }
+        }
+        history = history;
+    }
+
+
+    // Функция, чтобы клик по любому месту окна ставил фокус в инпут
+    function focusInput() {
+        inputRef.focus();
+    }
+
+    onMount(() => {
+        typeResponse('Welcome to Waltorvi OS. Type `help` for inspiration, darling. ✨');
+
+        focusTerminal.set(focusInput)
+
+        inputRef.focus();
+    });
+</script>
+
+
+<div class="terminal-content">
+    {#each history as line (line.id)}
+        <div class="line" in:fade={{ duration: 300, delay: 50 }}>
+            {#if line.isCommand}
+                <span class="prompt">waltorvi@space:~$</span>
+            {/if}
+            <span>{@html line.text}</span>
+        </div>
+    {/each}
+
+    <div class="input-line">
+        <span class="prompt">waltorvi@space:~$</span>
+        <form on:submit|preventDefault={handleCommand} class="input-form">
+            <input
+                    type="text"
+                    bind:this={inputRef}
+                    bind:value={command}
+                    spellcheck="false"
+                    autocomplete="off"
+            />
+        </form>
+    </div>
+</div>
+
+<style>
+    .terminal-content {
+        width: 100%;
+        height: 100%;
+    }
+    .line {
+        line-height: 1.5;
+        white-space: pre-wrap;
+    }
+    .prompt {
+        color: var(--prompt);
+        margin-right: 8px;
+        font-weight: bold;
+    }
+    .input-line {
+        display: flex;
+        align-items: center;
+    }
+    .input-form {
+        flex: 1;
+    }
+    input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--foreground);
+        font-family: var(--font);
+        font-size: 1em;
+        width: 100%;
+    }
+    @keyframes blink {
+        from,
+        to {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0;
+        }
+    }
+</style>
