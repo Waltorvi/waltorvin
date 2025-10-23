@@ -28,12 +28,15 @@
         command = ''; // Очищаем инпут мгновенно, чтобы пользователь мог печатать дальше
 
         if (userCommand.toLowerCase() === 'help') {
-            await typeResponse('Доступные команды: [about], [socials], [clear]. Но они появятся чуть позже, дорогуша!');
+            await typeResponse('Доступные команды: <code>[about]</code>, [socials], [clear]. Но они появятся чуть позже, дорогуша!', true);
         }
         else if (userCommand.toLowerCase() === 'rarity') {
             await typeResponse('тут будет че та да')
         } else if (userCommand.toLowerCase() === 'socials') {
-            await typeResponse('Telegram: @Waltorvi<br> <i style="color: blue">Twitter</i>: <i style="color: red">@Waltorvi</i>', true)
+            await typeResponse('<b style="color: #2a7fa3">Telegram</b>: @Waltorvi<br><b style="color: #325aa8">Twitter</b>: @Waltorvi' +
+                '<br><b style="color: #571723">Email</b>: some@mail.com', true)
+        } else if (userCommand.toLowerCase() === 'clear') {
+            history = [];
         } else {
             await typeResponse(`Неизвестная команда: "${userCommand}". Попробуй 'help'.`);
         }
@@ -44,12 +47,12 @@
     }
 
     async function typeResponse(text: string, isHtml = false) {
-        addHistoryLine('');
+        addHistoryLine(isHtml ? text : '');
 
         const lastLine = history[history.length - 1];
         if (isHtml) {
             await sleep(100);
-            lastLine.text = text;
+            history = history
         } else {
             for (let i = 0; i < text.length; i++) {
                 lastLine.text += text.charAt(i);
@@ -107,11 +110,18 @@
     }
     .line {
         line-height: 1.5;
-        white-space: pre-wrap;
+        white-space: pre-line;
+        word-wrap: break-word;
+        text-wrap: pretty;
+    }
+    .input-line .prompt {
+        color: var(--prompt);
+        margin-right: 8px;
+        font-weight: bold;
     }
     .prompt {
         color: var(--prompt);
-        margin-right: 8px;
+        margin-right: 0;
         font-weight: bold;
     }
     .input-line {
