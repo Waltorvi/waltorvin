@@ -28,13 +28,13 @@
         command = ''; // Очищаем инпут мгновенно, чтобы пользователь мог печатать дальше
 
         if (userCommand.toLowerCase() === 'help') {
-            await typeResponse('Доступные команды: <code>[about]</code>, [socials], [clear]. Но они появятся чуть позже, дорогуша!', true);
+            await typeResponse('Доступные команды: <code>[about]</code>, [socials], [clear]. Но они появятся чуть позже, дорогуша!');
         }
         else if (userCommand.toLowerCase() === 'rarity') {
             await typeResponse('тут будет че та да')
         } else if (userCommand.toLowerCase() === 'socials') {
             await typeResponse('<b style="color: #2a7fa3">Telegram</b>: @Waltorvi<br><b style="color: #325aa8">Twitter</b>: @Waltorvi' +
-                '<br><b style="color: #571723">Email</b>: some@mail.com', true)
+                '<br><b style="color: #571723">Email</b>: some@mail.com')
         } else if (userCommand.toLowerCase() === 'clear') {
             history = [];
         } else {
@@ -50,14 +50,35 @@
         addHistoryLine(isHtml ? text : '');
 
         const lastLine = history[history.length - 1];
+        let tag = '';
+        let tag_flag = false
         if (isHtml) {
             await sleep(100);
             history = history
         } else {
             for (let i = 0; i < text.length; i++) {
+                console.log(tag_flag, tag)
+                if (text.charAt(i) === '<') {
+                    tag_flag = true
+                    tag += text.charAt(i)
+                    continue
+                }
+                if (text.charAt(i) === '>') {
+                    tag_flag = false
+                    tag += text.charAt(i)
+                    lastLine.text += tag
+                    tag = ''
+                    history = history
+                    continue
+                }
+                if (tag_flag) {
+                    tag += text.charAt(i)
+                    continue
+                }
+
                 lastLine.text += text.charAt(i);
                 history = history;
-                await sleep(15 - i/10);
+                await sleep(15 - i/100);
             }
         }
         history = history;
