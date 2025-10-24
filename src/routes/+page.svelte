@@ -50,8 +50,9 @@
         addHistoryLine(isHtml ? text : '');
 
         const lastLine = history[history.length - 1];
-        let tag = '';
+        let tag = ''; // Сюда храним html Теги
         let tag_flag = false
+        let skipped = 0 // Чтобы написание текста не ускорялось от html тегов
         if (isHtml) {
             await sleep(100);
             history = history
@@ -61,6 +62,7 @@
                 if (text.charAt(i) === '<') {
                     tag_flag = true
                     tag += text.charAt(i)
+                    skipped += 1
                     continue
                 }
                 if (text.charAt(i) === '>') {
@@ -68,17 +70,21 @@
                     tag += text.charAt(i)
                     lastLine.text += tag
                     tag = ''
+                    skipped += 1
                     history = history
                     continue
                 }
                 if (tag_flag) {
                     tag += text.charAt(i)
+                    skipped += 1
                     continue
                 }
 
                 lastLine.text += text.charAt(i);
                 history = history;
-                await sleep(15 - i/100);
+                const sleep_time = 15 - (i-skipped)/100
+                console.log(sleep_time)
+                await sleep(sleep_time);
             }
         }
         history = history;
