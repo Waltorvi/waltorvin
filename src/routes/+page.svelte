@@ -1,8 +1,14 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
+    import { afterUpdate } from 'svelte';
 
     import { focusTerminal } from "$lib/stores";
+
+    // Функцция для прокртик страницы вниз, когда появляются новые линии и переполнено
+    afterUpdate(() => {
+        window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+    });
 
     type HistoryLine = {
         id: number;
