@@ -30,19 +30,38 @@
 
         addHistoryLine(command, true);
 
-        const userCommand = command;
+        const userCommand = command.toLowerCase();
         command = ''; // Очищаем инпут мгновенно, чтобы пользователь мог печатать дальше
 
-        if (userCommand.toLowerCase() === 'help') {
-            await typeResponse('Доступные команды: <code>[about]</code>, [socials], [clear]. Но они появятся чуть позже, дорогуша!');
+            // help
+        if (userCommand === 'help') {
+            await typeResponse('Помощь? Милый, я сам её ищу...')
+            await sleep(31) // Идеально для того, чтобы убрать текст до того, как он появится
+            history = history
+            history.pop()
+            await typeResponse('Доступные команды: [about], [socials], [clear]. Но они появятся чуть позже, дорогуша!');
         }
-        else if (userCommand.toLowerCase() === 'rarity') {
+
+            // rarity
+        else if (userCommand === 'rarity') {
             await typeResponse('тут будет че та да')
-        } else if (userCommand.toLowerCase() === 'socials') {
+
+            // socials
+        } else if (userCommand === 'socials') {
             await typeResponse('<b style="color: #2a7fa3">Telegram</b>: @Waltorvi<br><b style="color: #325aa8">Twitter</b>: @Waltorvi' +
-                '<br><b style="color: #571723">Email</b>: some@mail.com')
-        } else if (userCommand.toLowerCase() === 'clear') {
+                '<br><b style="color: #97273c">Email</b>: some@mail.com')
+
+            // clear
+        } else if (userCommand === 'clear') {
             history = [];
+
+            // whoami
+        } else if (userCommand === 'whoami') {
+            await typeResponse('Самый лучший человек на свете ✨')
+
+            // exit / quit
+        } else if (userCommand === 'exit' || userCommand == 'quit') {
+            await typeResponse('Ты так просто отсюда не уйдешь, дорогуша 😘')
         } else {
             await typeResponse(`Неизвестная команда: "${userCommand}". Попробуй 'help'.`);
         }
